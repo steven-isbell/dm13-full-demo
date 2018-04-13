@@ -5,12 +5,14 @@ const cors = require("cors");
 const session = require("express-session");
 const massive = require("massive");
 const passport = require("passport");
+const path = require("path");
 
 const { strat, logout, getUser } = require(`${__dirname}/controllers/authCtrl`);
 const {
   getProducts,
   getCart,
-  addToCart
+  addToCart,
+  removeFromCart
 } = require(`${__dirname}/controllers/productCtrl`);
 
 const port = process.env.PORT || 3001;
@@ -23,6 +25,10 @@ massive(process.env.CONNECTION_STRING)
 
 app.use(json());
 app.use(cors());
+
+// FOR PRODUCTION
+
+// app.use(express.static(`${__dirname}/../build/`));
 
 app.use(
   session({
@@ -67,8 +73,8 @@ passport.deserializeUser((user, done) => {
 app.get(
   "/auth",
   passport.authenticate("auth0", {
-    successRedirect: "http://localhost:3000/#/",
-    failureRedirect: "http://localhost:3000/#/login"
+    successRedirect: "/#/",
+    failureRedirect: "/#/login"
   })
 );
 app.get("/logout", logout);
@@ -78,6 +84,13 @@ app.get("/api/me", getUser);
 app.get("/api/product", getProducts);
 app.get("/api/cart", getCart);
 app.post("/api/cart/:id", addToCart);
+app.delete("/api/cart/:id", removeFromCart);
+
+// FOR PRODUCTION
+
+// app.get("*", (req, res) => {
+//   res.sendFile(path.join(__dirname, "../build/index.html"));
+// });
 
 app.listen(port, () => {
   console.log(`Listening on port ${port}`);

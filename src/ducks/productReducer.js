@@ -3,6 +3,7 @@ import axios from "axios";
 const GET_PRODUCTS = "GET_PRODUCTS";
 const GET_CART = "GET_CART";
 const ADD_TO_CART = "ADD_TO_CART";
+const REMOVE_FROM_CART = "REMOVE_FROM_CART";
 
 export function getProducts() {
   return {
@@ -25,6 +26,13 @@ export function addToCart(id) {
   };
 }
 
+export function removeFromCart(id) {
+  return {
+    type: REMOVE_FROM_CART,
+    payload: axios.delete(`/api/cart/${id}`)
+  };
+}
+
 const initialState = {
   products: [],
   cart: []
@@ -37,12 +45,9 @@ export default function productReducer(state = initialState, action) {
         ...state,
         products: action.payload.data
       };
-    case `${GET_CART}_FULFILLED`:
-      return {
-        ...state,
-        cart: action.payload.data
-      };
     case `${ADD_TO_CART}_FULFILLED`:
+    case `${REMOVE_FROM_CART}_FULFILLED`:
+    case `${GET_CART}_FULFILLED`:
       return {
         ...state,
         cart: action.payload.data
